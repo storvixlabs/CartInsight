@@ -1,0 +1,155 @@
+<?php
+/** @var \Magento\Backend\Block\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \StorvixLabs\CartInsight\ViewModel\Report $viewModel */
+$viewModel = $block->getData('view_model');
+$criteria = $viewModel->getCriteria();
+$summary = $viewModel->getSummary();
+$funnel = $viewModel->getFunnel();
+$ranges = $viewModel->getValueRanges();
+$methods = $viewModel->getPaymentMethods();
+$carts = $viewModel->getCarts();
+$maxRange = max(1, ...array_column($ranges, 'carts'));
+$params = ['from' => $criteria->from, 'to' => $criteria->to, 'hours' => $criteria->abandonedAfterHours];
+?>
+<form class="storvixlabs-ci-filter" method="get" action="<?= $escaper->escapeUrl($block->getUrl('*/*/index')) ?>">
+    <div>
+        <label for="ci-from"><?= $escaper->escapeHtml(__('From')) ?></label>
+        <input type="date" id="ci-from" name="from" class="admin__control-text"
+               value="<?= $escaper->escapeHtmlAttr($criteria->from) ?>">
+    </div>
+    <div>
+        <label for="ci-to"><?= $escaper->escapeHtml(__('To')) ?></label>
+        <input type="date" id="ci-to" name="to" class="admin__control-text"
+               value="<?= $escaper->escapeHtmlAttr($criteria->to) ?>">
+    </div>
+    <div>
+        <label for="ci-hours"><?= $escaper->escapeHtml(__('Abandoned after (hours)')) ?></label>
+        <input type="number" min="1" id="ci-hours" name="hours" class="admin__control-text"
+               value="<?= (int)$criteria->abandonedAfterHours ?>">
+    </div>
+    <button type="submit" class="action-default primary"><?= $escaper->escapeHtml(__('Show')) ?></button>
+    <a class="action-default" href="<?= $escaper->escapeUrl($block->getUrl('*/*/export', $params)) ?>">
+        <?= $escaper->escapeHtml(__('Export Carts (CSV)')) ?>
+    </a>
+</form>
+
+<div class="storvixlabs-ci-kpis">
+    <div class="storvixlabs-ci-kpi"><strong><?= (int)$summary['carts'] ?></strong><span><?= $escaper->escapeHtml(__('Abandoned carts')) ?></span></div>
+    <div class="storvixlabs-ci-kpi"><strong><?= $escaper->escapeHtml($viewModel->formatMoney($summary['value'])) ?></strong><span><?= $escaper->escapeHtml(__('Abandoned value')) ?></span></div>
+    <div class="storvixlabs-ci-kpi"><strong><?= $escaper->escapeHtml($viewModel->formatMoney($summary['average'])) ?></strong><span><?= $escaper->escapeHtml(__('Average cart')) ?></span></div>
+    <div class="storvixlabs-ci-kpi"><strong><?= $escaper->escapeHtml($viewModel->formatPercent($summary['rate'])) ?></strong><span><?= $escaper->escapeHtml(__('Abandonment rate (%1 orders placed)', $summary['orders'])) ?></span></div>
+    <div class="storvixlabs-ci-kpi"><strong><?= (int)$summary['with_email'] ?></strong><span><?= $escaper->escapeHtml(__('Carts with an email (recoverable)')) ?></span></div>
+</div>
+
+<div class="storvixlabs-ci-grid">
+    <div>
+        <h2><?= $escaper->escapeHtml(__('Where customers drop off')) ?></h2>
+        <div class="admin__table-wrapper">
+            <table class="data-grid">
+                <thead><tr>
+                    <th class="data-grid-th"><?= $escaper->escapeHtml(__('Step')) ?></th>
+                    <th class="data-grid-th storvixlabs-ci-num"><?= $escaper->escapeHtml(__('Reached')) ?></th>
+                    <th class="data-grid-th storvixlabs-ci-num"><?= $escaper->escapeHtml(__('Lost here')) ?></th>
+                    <th class="data-grid-th storvixlabs-ci-num"><?= $escaper->escapeHtml(__('Lost %')) ?></th>
+                </tr></thead>
+                <tbody>
+                <?php foreach ($funnel as $step): ?>
+                    <tr>
+                        <td><?= $escaper->escapeHtml($step['label']) ?></td>
+                        <td class="storvixlabs-ci-num"><?= (int)$step['reached'] ?></td>
+                        <td class="storvixlabs-ci-num"><?= (int)$step['lost'] ?></td>
+                        <td class="storvixlabs-ci-num"><?= $escaper->escapeHtml($viewModel->formatPercent($step['share'])) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <p class="storvixlabs-ci-note"><?= $escaper->escapeHtml(__('"Reached" counts abandoned carts plus placed orders that got at least this far. Steps are read from the cart: a saved address, a chosen shipping method, a chosen payment method.')) ?></p>
+    </div>
+
+    <div>
+        <h2><?= $escaper->escapeHtml(__('Abandoned cart values')) ?></h2>
+        <div class="admin__table-wrapper">
+            <table class="data-grid">
+                <thead><tr>
+                    <th class="data-grid-th"><?= $escaper->escapeHtml(__('Cart value')) ?></th>
+                    <th class="data-grid-th storvixlabs-ci-num"><?= $escaper->escapeHtml(__('Carts')) ?></th>
+                    <th class="data-grid-th storvixlabs-ci-num"><?= $escaper->escapeHtml(__('Total')) ?></th>
+                    <th class="data-grid-th"></th>
+                </tr></thead>
+                <tbody>
+                <?php foreach ($ranges as $range): ?>
+                    <tr>
+                        <td><?= $escaper->escapeHtml($range['label']) ?></td>
+                        <td class="storvixlabs-ci-num"><?= (int)$range['carts'] ?></td>
+                        <td class="storvixlabs-ci-num"><?= $escaper->escapeHtml($viewModel->formatMoney($range['value'])) ?></td>
+                        <td class="storvixlabs-ci-bar-cell"><div class="storvixlabs-ci-bar" style="width: <?= (int)round($range['carts'] / $maxRange * 100) ?>%"></div></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<h2><?= $escaper->escapeHtml(__('Payment methods')) ?></h2>
+<div class="admin__table-wrapper">
+    <table class="data-grid">
+        <thead><tr>
+            <th class="data-grid-th"><?= $escaper->escapeHtml(__('Method')) ?></th>
+            <th class="data-grid-th storvixlabs-ci-num"><?= $escaper->escapeHtml(__('Carts lost after choosing it')) ?></th>
+            <th class="data-grid-th storvixlabs-ci-num"><?= $escaper->escapeHtml(__('Value lost')) ?></th>
+            <th class="data-grid-th storvixlabs-ci-num"><?= $escaper->escapeHtml(__('Orders placed')) ?></th>
+            <th class="data-grid-th storvixlabs-ci-num"><?= $escaper->escapeHtml(__('Orders failed')) ?></th>
+            <th class="data-grid-th storvixlabs-ci-num"><?= $escaper->escapeHtml(__('Failure rate')) ?></th>
+        </tr></thead>
+        <tbody>
+        <?php if ($methods === []): ?>
+            <tr><td colspan="6"><?= $escaper->escapeHtml(__('No payment data in this period.')) ?></td></tr>
+        <?php endif; ?>
+        <?php foreach ($methods as $method): ?>
+            <tr>
+                <td><?= $escaper->escapeHtml($method['title']) ?> <small>(<?= $escaper->escapeHtml($method['code']) ?>)</small></td>
+                <td class="storvixlabs-ci-num"><?= (int)$method['abandoned'] ?></td>
+                <td class="storvixlabs-ci-num"><?= $escaper->escapeHtml($viewModel->formatMoney($method['abandoned_value'])) ?></td>
+                <td class="storvixlabs-ci-num"><?= (int)$method['orders'] ?></td>
+                <td class="storvixlabs-ci-num"><?= (int)$method['failed'] ?></td>
+                <td class="storvixlabs-ci-num"><?= $escaper->escapeHtml($viewModel->formatPercent($method['failure_rate'])) ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+<p class="storvixlabs-ci-note"><?= $escaper->escapeHtml(__('A failed order is one that is canceled, still pending payment or in payment review. Cancellations made by staff for other reasons are included.')) ?></p>
+
+<h2><?= $escaper->escapeHtml(__('Largest abandoned carts')) ?></h2>
+<div class="admin__table-wrapper">
+    <table class="data-grid">
+        <thead><tr>
+            <th class="data-grid-th"><?= $escaper->escapeHtml(__('Cart')) ?></th>
+            <th class="data-grid-th"><?= $escaper->escapeHtml(__('Last activity (UTC)')) ?></th>
+            <th class="data-grid-th"><?= $escaper->escapeHtml(__('Email')) ?></th>
+            <th class="data-grid-th storvixlabs-ci-num"><?= $escaper->escapeHtml(__('Items')) ?></th>
+            <th class="data-grid-th storvixlabs-ci-num"><?= $escaper->escapeHtml(__('Value')) ?></th>
+            <th class="data-grid-th"><?= $escaper->escapeHtml(__('Reached')) ?></th>
+            <th class="data-grid-th"><?= $escaper->escapeHtml(__('Payment method')) ?></th>
+        </tr></thead>
+        <tbody>
+        <?php if ($carts === []): ?>
+            <tr><td colspan="7"><?= $escaper->escapeHtml(__('No abandoned carts in this period.')) ?></td></tr>
+        <?php endif; ?>
+        <?php foreach ($carts as $cart): ?>
+            <tr>
+                <td>#<?= (int)$cart['quote_id'] ?></td>
+                <td><?= $escaper->escapeHtml($cart['updated_at']) ?></td>
+                <td><?= $escaper->escapeHtml((string)$cart['customer_email']) ?></td>
+                <td class="storvixlabs-ci-num"><?= (int)$cart['items_count'] ?></td>
+                <td class="storvixlabs-ci-num"><?= $escaper->escapeHtml($viewModel->formatMoney((float)$cart['value'])) ?></td>
+                <td><?= $escaper->escapeHtml($cart['stage_label']) ?></td>
+                <td><?= $escaper->escapeHtml($cart['payment_title']) ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>

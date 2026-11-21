@@ -1,0 +1,21 @@
+{
+    "name": "storvixlabs/module-cart-insight",
+    "description": "Lightweight abandoned cart report: where customers drop off in checkout, which cart values are abandoned and which payment methods fail.",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": ["MIT", "OSL-3.0"],
+    "require": {
+        "php": "~8.3.0||~8.4.0||~8.5.0",
+        "magento/framework": "*",
+        "magento/module-backend": "*",
+        "magento/module-quote": "*",
+        "magento/module-reports": "*",
+        "magento/module-sales": "*"
+    },
+    "autoload": {
+        "files": ["registration.php"],
+        "psr-4": {
+            "StorvixLabs\\CartInsight\\": ""
+        }
+    }
+}

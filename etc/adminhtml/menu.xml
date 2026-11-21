@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="StorvixLabs_CartInsight::report" title="Cart Insight" translate="title"
+             module="StorvixLabs_CartInsight" sortOrder="25" parent="Magento_Reports::report_marketing"
+             action="storvixlabs_cartinsight/report/index" resource="StorvixLabs_CartInsight::report"/>
+    </menu>
+</config>

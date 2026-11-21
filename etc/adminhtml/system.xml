@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="storvixlabs_cartinsight" translate="label" sortOrder="953" showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>Cart Insight</label>
+            <tab>sales</tab>
+            <resource>StorvixLabs_CartInsight::config</resource>
+            <group id="general" translate="label" sortOrder="10" showInDefault="1">
+                <label>Abandoned Cart Report</label>
+                <field id="abandoned_after_hours" translate="label comment" type="text" sortOrder="10" showInDefault="1" canRestore="1">
+                    <label>Cart Is Abandoned After (hours)</label>
+                    <comment>An active cart with items that was not touched for this long counts as abandoned.</comment>
+                    <validate>required-entry validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="default_period_days" translate="label comment" type="text" sortOrder="20" showInDefault="1" canRestore="1">
+                    <label>Default Period (days)</label>
+                    <validate>required-entry validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="value_buckets" translate="label comment" type="text" sortOrder="30" showInDefault="1" canRestore="1">
+                    <label>Cart Value Ranges</label>
+                    <comment>Upper limits in base currency, separated by commas. 50,100,250 gives: under 50, 50-100, 100-250 and 250 or more.</comment>
+                    <validate>required-entry</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

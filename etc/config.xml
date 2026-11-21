@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <storvixlabs_cartinsight>
+            <general>
+                <abandoned_after_hours>1</abandoned_after_hours>
+                <default_period_days>30</default_period_days>
+                <value_buckets>50,100,250,500,1000</value_buckets>
+            </general>
+        </storvixlabs_cartinsight>
+    </default>
+</config>

@@ -1,0 +1,11 @@
+.storvixlabs-ci-filter { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 24px; }
+.storvixlabs-ci-filter label { display: block; font-weight: 600; margin-bottom: 4px; }
+.storvixlabs-ci-kpis { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+.storvixlabs-ci-kpi { background: #fff; border: 1px solid #ccc; padding: 14px 18px; min-width: 170px; }
+.storvixlabs-ci-kpi strong { display: block; font-size: 2.4rem; line-height: 1.2; }
+.storvixlabs-ci-kpi span { color: #666; }
+.storvixlabs-ci-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; margin-bottom: 24px; }
+.storvixlabs-ci-bar { background: #eb5202; height: 8px; min-width: 1px; }
+.storvixlabs-ci-bar-cell { width: 30%; }
+.storvixlabs-ci-num { text-align: right; white-space: nowrap; }
+.storvixlabs-ci-note { color: #666; margin: 8px 0 0; }
